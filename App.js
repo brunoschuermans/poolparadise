@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import {ThemeProvider, Toolbar} from "react-native-material-ui";
+import {ThemeProvider} from "react-native-material-ui";
 import {View} from "react-native";
 import AppNavigator from "./AppNavigator";
-import {NavigationActions} from "react-navigation";
 
 const uiTheme = {
     palette: {},
@@ -21,15 +20,7 @@ export default class App extends Component {
                         flex: 1,
                     }}
                 >
-                    <Toolbar
-                        leftElement="home"
-                        onLeftElementPress={() => this.appNavigator.dispatch(NavigationActions.navigate({
-                            type: NavigationActions.NAVIGATE,
-                            routeName: "Home",
-                        }))}
-                        centerElement="Pool Paradise"
-                    />
-                    <AppNavigator ref={appNavigator => this.appNavigator = appNavigator}/>
+                    <AppNavigator/>
                 </View>
             </ThemeProvider>
         );

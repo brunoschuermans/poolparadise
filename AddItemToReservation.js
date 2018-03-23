@@ -1,14 +1,21 @@
 import React, {Component} from 'react';
-import {AsyncStorage, Button} from "react-native";
+import {Button, Text, View} from "react-native";
 
 export default class AddItemToReservation extends Component {
 
     state = {
-        loadingOrderedItems: false,
+        postingOrderedItems: false,
         error: false,
+        orderedItemsPosted: false,
+        postedItems: [],
     };
 
-    componentWillMount() {
+    addItems() {
+        this.setState({postingOrderedItems: true});
+        this.props.orderedItems.map(item => this.fetchToken(() => this.postItemToReservation(this.props.guest.reservationID, item.itemID)));
+    }
+
+    fetchToken(onFulfilled) {
         fetch("https://refresh-token-198718.appspot.com",
             {
                 method: 'GET',
@@ -26,6 +33,7 @@ export default class AddItemToReservation extends Component {
                 }
 
                 this.setState({accessToken: responseJson.access_token});
+                onFulfilled();
             })
             .catch(error => {
                 console.log(error);
@@ -33,11 +41,6 @@ export default class AddItemToReservation extends Component {
                     error: true,
                 });
             });
-    }
-
-    addItems() {
-        this.setState({loadingOrderedItems: true});
-        this.props.items.map(item => this.postItemToReservation(this.props.guest.reservationID, item.itemID));
     }
 
     postItemToReservation(reservationID, itemID) {
@@ -62,15 +65,18 @@ export default class AddItemToReservation extends Component {
                     throw new Error(responseJson.message);
                 }
 
-                console.log(responseJson);
+                this.state.postedItems.push(itemID);
 
-                AsyncStorage.setItem("items", JSON.stringify(responseJson.data));
-                this.setState({loadingItems: false});
+                if (this.state.postedItems.length === this.props.orderedItems.length) {
+                    this.setState({orderedItemsPosted: true});
+                    this.props.clear();
+                }
+
+                console.log(responseJson);
             })
             .catch(error => {
                 console.log(error);
                 this.setState({
-                    loadingOrderedItems: false,
                     error: true,
                 });
             });
@@ -78,11 +84,38 @@ export default class AddItemToReservation extends Component {
 
     render() {
         return (
-            <Button
-                title="Add item(s) to guest"
-                onPress={() => this.addItems()}
-                disabled={this.state.loadingOrderedItems}
-            />
+            <View>
+                {this.renderSuccess()}
+                {this.renderError()}
+                <Button
+                    title="Add item(s) to guest"
+                    onPress={() => this.addItems()}
+                    disabled={this.state.postingOrderedItems}
+                />
+            </View>
         );
     }
+
+    renderError() {
+        return this.state.error &&
+            <View style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <Text style={{color: "red"}}>An error occured</Text>
+            </View>;
+    }
+
+    renderSuccess() {
+        return this.state.orderedItemsPosted &&
+            <View style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <Text style={{color: "green"}}>Transaction successful</Text>
+            </View>;
+    }
+
 }

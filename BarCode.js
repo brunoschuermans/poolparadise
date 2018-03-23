@@ -1,14 +1,10 @@
 import React, {Component} from 'react';
-import {Text, View} from "react-native";
+import {View} from "react-native";
 import {RNCamera} from 'react-native-camera';
 
 export default class BarCode extends Component {
 
     state = {};
-
-    static navigationOptions = {
-        title: "Bar code"
-    };
 
     render() {
         return (
@@ -25,10 +21,6 @@ export default class BarCode extends Component {
                         }}
                         onBarCodeRead={event => this.setState({barcode: event.data})}
                     />
-                }
-                {
-                    this.state.barcode &&
-                    <Text>{this.state.barcode}</Text>
                 }
             </View>
         );

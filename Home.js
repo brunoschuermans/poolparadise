@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {ActivityIndicator, AsyncStorage, Button, FlatList, Text, View} from "react-native";
-import AddItemToGuest from "./AddItemToReservation";
+import {ActivityIndicator, AsyncStorage, Button, Text, View} from "react-native";
+import {Toolbar} from "react-native-material-ui";
 
 export default class Home extends Component {
 
@@ -14,8 +14,6 @@ export default class Home extends Component {
         this.fetchToken(() => {
             this.getGuestsFromStorage();
             this.getItemsFromStorage();
-            this.getGuestFromStorage();
-            this.getOrderedItemsFromStorage();
         });
     }
 
@@ -24,6 +22,7 @@ export default class Home extends Component {
 
         if (guests) {
             this.setState({guests: JSON.parse(guests)});
+            console.log(JSON.parse(guests), "cached guests");
         } else {
             this.fetchGuests();
         }
@@ -34,42 +33,17 @@ export default class Home extends Component {
 
         if (items) {
             this.setState({items: JSON.parse(items)});
+            console.log(JSON.parse(items), "cached items");
         } else {
             this.fetchItems();
         }
     }
 
-    async getGuestFromStorage() {
-        const guest = await AsyncStorage.getItem("guest");
-
-        if (guest) {
-            console.log(guest);
-            this.setState({guest: JSON.parse(guest)});
-        }
-    }
-
-    async getOrderedItemsFromStorage() {
-        const orderedItems = await AsyncStorage.getItem("orderedItems");
-
-        if (orderedItems) {
-            this.setState({orderedItems: JSON.parse(orderedItems)});
-        }
-    }
-
     refreshData() {
+        this.setState({error: false});
         this.fetchToken(() => {
             this.fetchGuests();
             this.fetchItems();
-        });
-    }
-
-    clear() {
-        AsyncStorage.removeItem("guest");
-        AsyncStorage.removeItem("orderedItems");
-        this.setState({
-            refresh: true,
-            guest: null,
-            orderedItems: null,
         });
     }
 
@@ -173,18 +147,15 @@ export default class Home extends Component {
             });
     }
 
-    total() {
-        return this.state.orderedItems
-            .map(order => order.price)
-            .reduce((a, b) => a + b, 0);
-    }
-
     render() {
         return (
             <View style={{flex: 1}}>
+                <Toolbar
+                    rightElement="shopping-cart"
+                    onRightElementPress={() => this.props.navigation.navigate("Categories")}
+                    centerElement="Pool Paradise"
+                />
                 {this.renderButtons()}
-                {this.renderGuestName()}
-                {this.renderOrderedItems()}
                 {this.renderLoading()}
                 {this.renderError()}
             </View>
@@ -201,8 +172,8 @@ export default class Home extends Component {
                     }}
                 >
                     <Button
-                        title="Select guest"
-                        onPress={() => this.props.navigation.navigate("Guests")}
+                        title="Scan guest"
+                        onPress={() => this.props.navigation.navigate("ScanGuest")}
                     />
                 </View>
                 <View
@@ -215,71 +186,6 @@ export default class Home extends Component {
                         onPress={() => this.refreshData()}
                     />
                 </View>
-                <View
-                    style={{
-                        marginBottom: 20,
-                    }}
-                >
-                    <Button
-                        title="bar code"
-                        onPress={() => this.props.navigation.navigate("BarCode")}
-                    />
-                </View>
-            </View>;
-    }
-
-    renderOrderedItems() {
-        return !(this.state.loadingGuests || this.state.loadingItems) &&
-            !this.state.error &&
-            this.state.orderedItems &&
-            <View>
-                <View
-                    style={{
-                        padding: 20,
-                    }}
-                >
-                    <FlatList
-                        keyExtractor={(item, index) => index.toString()}
-                        data={this.state.orderedItems}
-                        renderItem={({item}) =>
-                            <Text
-                                key={Math.random()}
-                                style={{
-                                    textAlign: "right",
-                                }}>
-                                {item.name} {item.price}
-                            </Text>
-                        }
-                    />
-                    <Text>TOTAL: {this.total()}</Text>
-                </View>
-                <View
-                    style={{
-                        marginBottom: 20,
-                    }}
-                >
-                    <AddItemToGuest items={this.state.orderedItems} guest={this.state.guest}/>
-                </View>
-                <View
-                    style={{
-                        marginBottom: 20,
-                    }}
-                >
-                    <Button title="Clear" onPress={() => this.clear()}/>
-                </View>
-            </View>;
-    }
-
-    renderGuestName() {
-        return !(this.state.loadingGuests || this.state.loadingItems) &&
-            !this.state.error &&
-            this.state.guest &&
-            <View
-                style={{
-                    padding: 20,
-                }}
-            >
-                <Text style={{fontSize: 25}}>{this.state.guest.guestName}</Text>
             </View>;
     }
 

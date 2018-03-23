@@ -3,7 +3,7 @@ import {AsyncStorage, Button, ScrollView, View} from "react-native";
 import {storeGuest} from "./App";
 import {Toolbar} from "react-native-material-ui";
 
-export default class Bar extends Component {
+export default class Kitchen extends Component {
 
     state = {
         items: [],
@@ -49,12 +49,12 @@ export default class Bar extends Component {
                     onLeftElementPress={() => this.props.navigation.navigate("Home")}
                     rightElement="shopping-cart"
                     onRightElementPress={() => this.props.navigation.navigate("Categories")}
-                    centerElement="Bar"
+                    centerElement="Kitchen"
                 />
                 <ScrollView>
                     {
                         this.state.items
-                            .filter(item => item.categoryName === "BAR")
+                            .filter(item => item.categoryName === "KITCHEN")
                             .sort((a, b) => (a.name > b.name) ? 1 : -1)
                             .map((item, index) =>
                                 (
