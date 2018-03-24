@@ -22,7 +22,7 @@ export default class Home extends Component {
             this.setState({guests: JSON.parse(guests)});
             console.log(JSON.parse(guests), "cached guests");
         } else {
-            this.fetchToken(this.fetchGuests());
+            this.fetchToken(this.fetchGuests.bind(this));
         }
     }
 
@@ -33,7 +33,7 @@ export default class Home extends Component {
             this.setState({items: JSON.parse(items)});
             console.log(JSON.parse(items), "cached items");
         } else {
-            this.fetchToken(this.fetchItems());
+            this.fetchToken(this.fetchItems.bind(this));
         }
     }
 
@@ -45,8 +45,8 @@ export default class Home extends Component {
         AsyncStorage.removeItem("guests");
         AsyncStorage.removeItem("items");
 
-        this.fetchGuests();
-        this.fetchItems();
+        this.fetchToken(this.fetchGuests.bind(this));
+        this.fetchToken(this.fetchItems.bind(this));
     }
 
     fetchToken(onFulfilled) {

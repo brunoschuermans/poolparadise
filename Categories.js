@@ -74,7 +74,7 @@ export default class Categories extends Component {
                 <Toolbar
                     leftElement="home"
                     onLeftElementPress={() => this.props.navigation.navigate("Home")}
-                    centerElement="Point of sell"
+                    centerElement="Point Of Sell"
                 />
                 {
                     this.state.guest &&
