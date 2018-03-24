@@ -151,9 +151,7 @@ export default class Categories extends Component {
     }
 
     renderOrderedItems() {
-        return this.state.orderedItems &&
-            this.state.orderedItems.length > 0 &&
-            this.state.guest &&
+        return this.state.guest &&
             <View>
                 <View
                     style={{
@@ -188,14 +186,17 @@ export default class Categories extends Component {
                         </View>
                     }
                 </View>
-                <View
-                    style={{
-                        marginBottom: 20,
-                    }}
-                >
-                    <AddItemToGuest orderedItems={this.state.orderedItems} guest={this.state.guest}
-                                    clear={this.clear.bind(this)}/>
-                </View>
+                {
+                    this.state.orderedItems.length > 0 &&
+                    <View
+                        style={{
+                            marginBottom: 20,
+                        }}
+                    >
+                        <AddItemToGuest orderedItems={this.state.orderedItems} guest={this.state.guest}
+                                        clear={this.clear.bind(this)}/>
+                    </View>
+                }
                 <View
                     style={{
                         marginBottom: 20,

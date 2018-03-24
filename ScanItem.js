@@ -9,6 +9,7 @@ export default class ScanItem extends Component {
         items: [],
         orderedItems: [],
         barCodeRead: false,
+        flashLight: false,
     };
 
     componentWillMount() {
@@ -32,6 +33,25 @@ export default class ScanItem extends Component {
         }
     }
 
+    barCodeRead(event) {
+        if(this.state.barCodeRead) {
+            return;
+        }
+
+        const item = this.state.items
+            .find(i => i.itemCode === event.data);
+
+        console.log(item);
+
+        this.order(item);
+        this.setState({barCodeRead: true});
+        this.props.navigation.navigate("Categories");
+    }
+
+    toggleFlashLight() {
+        this.setState({flashLight: !this.state.flashLight});
+    }
+
     order(item) {
         this.state.orderedItems.push(item);
         console.log(item);
@@ -47,8 +67,10 @@ export default class ScanItem extends Component {
                 }}
             >
                 <Toolbar
-                    leftElement="home"
-                    onLeftElementPress={() => this.props.navigation.navigate("Home")}
+                    leftElement="shopping-cart"
+                    onLeftElementPress={() => this.props.navigation.navigate("Categories")}
+                    rightElement="highlight"
+                    onRightElementPress={() => this.toggleFlashLight()}
                     centerElement="Scan Item"
                 />
                 <View
@@ -61,20 +83,8 @@ export default class ScanItem extends Component {
                             style={{
                                 flex: 1,
                             }}
-                            onBarCodeRead={event => {
-                                if(this.state.barCodeRead) {
-                                    return;
-                                }
-
-                                const item = this.state.items
-                                    .find(i => i.itemCode === event.data);
-
-                                console.log(item);
-
-                                this.order(item);
-                                this.setState({barCodeRead: true});
-                                this.props.navigation.navigate("Categories");
-                            }}
+                            flashMode={this.state.flashLight ? RNCamera.Constants.FlashMode.torch : RNCamera.Constants.FlashMode.off}
+                            onBarCodeRead={event => this.barCodeRead(event)}
                         />
                     }
                 </View>

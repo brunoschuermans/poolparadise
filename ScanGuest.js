@@ -8,6 +8,7 @@ export default class ScanGuest extends Component {
     state = {
         guests: [],
         barCodeRead: false,
+        flashLight: false,
     };
 
     componentWillMount() {
@@ -20,47 +21,54 @@ export default class ScanGuest extends Component {
         });
     }
 
+    toggleFlashLight() {
+        this.setState({flashLight: !this.state.flashLight});
+    }
+
+    barCodeRead(event) {
+        if (this.state.barCodeRead) {
+            return;
+        }
+
+        const guest = this.state.guests
+            .filter(guest => guest.guestNotes.length > 0)
+            .find(guest => guest.guestNotes[0].note === event.data);
+
+        console.log(guest);
+
+        AsyncStorage.setItem("guest", JSON.stringify(guest));
+        this.setState({barCodeRead: true});
+        this.props.navigation.navigate("Categories");
+    }
+
     render() {
-        return (
+        return <View
+            style={{
+                flex: 1,
+            }}
+        >
+            <Toolbar
+                leftElement="home"
+                onLeftElementPress={() => this.props.navigation.navigate("Home")}
+                rightElement="highlight"
+                onRightElementPress={() => this.toggleFlashLight()}
+                centerElement="Scan Guest"
+            />
             <View
                 style={{
                     flex: 1,
                 }}
             >
-                <Toolbar
-                    leftElement="home"
-                    onLeftElementPress={() => this.props.navigation.navigate("Home")}
-                    centerElement="Scan Guest"
-                />
-                <View
-                    style={{
-                        flex: 1,
-                    }}
-                >
-                    {
-                        <RNCamera
-                            style={{
-                                flex: 1,
-                            }}
-                            onBarCodeRead={event => {
-                                if(this.state.barCodeRead) {
-                                    return;
-                                }
-
-                                const guest = this.state.guests
-                                    .filter(guest => guest.guestNotes.length > 0)
-                                    .find(guest => guest.guestNotes[0].note === event.data);
-
-                                console.log(guest);
-
-                                AsyncStorage.setItem("guest", JSON.stringify(guest));
-                                this.setState({barCodeRead: true});
-                                this.props.navigation.navigate("Categories");
-                            }}
-                        />
-                    }
-                </View>
+                {
+                    <RNCamera
+                        style={{
+                            flex: 1,
+                        }}
+                        flashMode={this.state.flashLight ? RNCamera.Constants.FlashMode.torch : RNCamera.Constants.FlashMode.off}
+                        onBarCodeRead={event => this.barCodeRead(event)}
+                    />
+                }
             </View>
-        );
+        </View>;
     }
 }
