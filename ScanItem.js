@@ -44,7 +44,10 @@ export default class ScanItem extends Component {
         console.log(item);
 
         this.order(item);
-        this.setState({barCodeRead: true});
+        this.setState({
+            barCodeRead: true,
+            flashLight: false,
+        });
         this.props.navigation.navigate("Categories");
     }
 

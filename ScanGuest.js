@@ -37,7 +37,10 @@ export default class ScanGuest extends Component {
         console.log(guest);
 
         AsyncStorage.setItem("guest", JSON.stringify(guest));
-        this.setState({barCodeRead: true});
+        this.setState({
+            barCodeRead: true,
+            flashLight: false,
+        });
         this.props.navigation.navigate("Categories");
     }
 

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Text, View} from "react-native";
+import {ActivityIndicator, Button, Text, View} from "react-native";
 
 export default class AddItemToReservation extends Component {
 
@@ -68,7 +68,10 @@ export default class AddItemToReservation extends Component {
                 this.state.postedItems.push(itemID);
 
                 if (this.state.postedItems.length === this.props.orderedItems.length) {
-                    this.setState({orderedItemsPosted: true});
+                    this.setState({
+                        orderedItemsPosted: true,
+                        postingOrderedItems: true,
+                    });
                     this.props.clear();
                 }
 
@@ -77,6 +80,7 @@ export default class AddItemToReservation extends Component {
             .catch(error => {
                 console.log(error);
                 this.setState({
+                    postingOrderedItems: false,
                     error: true,
                 });
             });
@@ -87,11 +91,14 @@ export default class AddItemToReservation extends Component {
             <View>
                 {this.renderSuccess()}
                 {this.renderError()}
-                <Button
-                    title="Add item(s) to guest"
-                    onPress={() => this.addItems()}
-                    disabled={this.state.postingOrderedItems}
-                />
+                {this.renderLoading()}
+                {
+                    !this.state.postingOrderedItems &&
+                    <Button
+                        title="Add item(s) to guest"
+                        onPress={() => this.addItems()}
+                    />
+                }
             </View>
         );
     }
@@ -118,4 +125,15 @@ export default class AddItemToReservation extends Component {
             </View>;
     }
 
+    renderLoading() {
+        return this.state.postingOrderedItems &&
+            !this.state.error &&
+            <View style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+            }}>
+                <ActivityIndicator size="large"/>
+            </View>;
+    }
 }
